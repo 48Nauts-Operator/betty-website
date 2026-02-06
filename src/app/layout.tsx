@@ -40,6 +40,8 @@ export const metadata: Metadata = {
   },
 };
 
+const isComingSoon = process.env.NEXT_PUBLIC_COMING_SOON === "true";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,18 +50,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script
-          defer
-          src="https://wave.21nauts.com/script.js"
-          data-website-id="c458a3e1-8bd9-4538-8712-896ca944b0c1"
-        />
+        {process.env.NEXT_PUBLIC_ANALYTICS_ID && (
+          <script
+            defer
+            src={process.env.NEXT_PUBLIC_ANALYTICS_URL || "https://wave.21nauts.com/script.js"}
+            data-website-id={process.env.NEXT_PUBLIC_ANALYTICS_ID}
+          />
+        )}
       </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
       >
-        <NavBar />
+        {!isComingSoon && <NavBar />}
         <main>{children}</main>
-        <Footer />
+        {!isComingSoon && <Footer />}
       </body>
     </html>
   );
