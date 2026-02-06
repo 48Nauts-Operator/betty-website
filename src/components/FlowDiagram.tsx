@@ -62,19 +62,20 @@ interface Layout {
 
 function computeLayout(w: number, h: number): Layout {
   const cx = w / 2;
-  const spread = Math.min(w * 0.28, 200);
+  const isMobile = w < 500;
+  const spread = isMobile ? Math.min(w * 0.32, 120) : Math.min(w * 0.28, 200);
 
   return {
     cx,
-    queryY: h * 0.06,
-    kgTop: h * 0.16,
-    kgBot: h * 0.42,
-    searchY: h * 0.30,
-    confY: h * 0.52,
-    routeY: h * 0.68,
+    queryY: h * 0.05,
+    kgTop: h * 0.12,
+    kgBot: isMobile ? h * 0.44 : h * 0.42,  // Taller box on mobile for stacked items
+    searchY: isMobile ? h * 0.28 : h * 0.30,
+    confY: isMobile ? h * 0.52 : h * 0.52,
+    routeY: isMobile ? h * 0.72 : h * 0.68,
     metricsY: h * 0.82,
-    kgLeft: cx - Math.min(w * 0.35, 240),
-    kgRight: cx + Math.min(w * 0.35, 240),
+    kgLeft: cx - Math.min(w * 0.42, 240),  // Wider on mobile
+    kgRight: cx + Math.min(w * 0.42, 240),
     highX: cx - spread,
     medX: cx,
     lowX: cx + spread,
@@ -285,12 +286,14 @@ export function FlowDiagram() {
         "Full-Text Search",
         "Relationship Mapping",
       ];
-      const searchSpacing = kgW / 4;
-      const searchStartX = L.kgLeft + searchSpacing * 0.55;
+      const isMobile = w < 500;
+      const searchSpacing = isMobile ? 0 : kgW / 4;
+      const searchStartX = isMobile ? L.cx : L.kgLeft + searchSpacing * 0.55;
+      const searchVerticalSpacing = isMobile ? 26 : 0;
 
       for (let i = 0; i < 3; i++) {
-        const sx = searchStartX + i * searchSpacing;
-        const sy = L.searchY;
+        const sx = isMobile ? searchStartX : searchStartX + i * searchSpacing;
+        const sy = isMobile ? L.searchY - 20 + i * searchVerticalSpacing : L.searchY;
 
         // Pulse animation: left→right wave
         let pulse = 0;
@@ -712,7 +715,7 @@ export function FlowDiagram() {
 
         <div
           ref={containerRef}
-          className="relative w-full h-[520px] md:h-[560px] lg:h-[580px]"
+          className="relative w-full h-[600px] sm:h-[540px] md:h-[560px] lg:h-[580px]"
         >
           <canvas
             ref={canvasRef}

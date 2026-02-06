@@ -34,15 +34,21 @@ const TEXT_MUTED = "#94A3B8";
 function getNodes(w: number, h: number): ArchNode[] {
   const cx = w / 2;
   const cy = h / 2;
-  const spreadX = Math.min(w * 0.3, 260);
-  const spreadY = Math.min(h * 0.28, 56);
+  const isMobile = w < 640;
+  
+  // Tighter spacing on mobile to prevent overlap
+  const spreadX = isMobile ? Math.min(w * 0.22, 180) : Math.min(w * 0.3, 260);
+  const spreadY = isMobile ? Math.min(h * 0.22, 44) : Math.min(h * 0.28, 56);
+  
+  // Scale down node sizes on mobile
+  const scale = isMobile ? 0.7 : 1;
 
   return [
-    { x: cx - spreadX * 1.2, y: cy, radius: 24, label: "User", sublabel: "Query", filled: false },
-    { x: cx - spreadX * 0.3, y: cy, radius: 30, label: "Betty", sublabel: "Router", filled: true },
-    { x: cx + spreadX * 0.5, y: cy, radius: 26, label: "Confidence", sublabel: "Check", filled: false },
-    { x: cx + spreadX * 1.2, y: cy - spreadY, radius: 22, label: "Knowledge", sublabel: "Direct · 50ms", filled: false },
-    { x: cx + spreadX * 1.2, y: cy + spreadY, radius: 22, label: "LLM", sublabel: "With context", filled: false },
+    { x: cx - spreadX * 1.2, y: cy, radius: 24 * scale, label: "User", sublabel: "Query", filled: false },
+    { x: cx - spreadX * 0.3, y: cy, radius: 30 * scale, label: "Betty", sublabel: "Router", filled: true },
+    { x: cx + spreadX * 0.5, y: cy, radius: 26 * scale, label: "Confidence", sublabel: "Check", filled: false },
+    { x: cx + spreadX * 1.2, y: cy - spreadY, radius: 22 * scale, label: "Knowledge", sublabel: "Direct · 50ms", filled: false },
+    { x: cx + spreadX * 1.2, y: cy + spreadY, radius: 22 * scale, label: "LLM", sublabel: "With context", filled: false },
   ];
 }
 
@@ -258,16 +264,22 @@ export function ArchitectureDiagram() {
         ctx.fillStyle = node.filled ? "#FFFFFF" : TEAL_LIGHT;
         ctx.fill();
 
-        // Label
-        ctx.font = `600 ${node.filled ? 13 : 11}px Inter, system-ui, sans-serif`;
+        // Label - scale font size for mobile
+        const isMobileView = w < 640;
+        const labelSize = isMobileView ? (node.filled ? 10 : 9) : (node.filled ? 13 : 11);
+        const sublabelSize = isMobileView ? 7 : 9;
+        const labelOffset = isMobileView ? 14 : 18;
+        const sublabelOffset = isMobileView ? 24 : 30;
+        
+        ctx.font = `600 ${labelSize}px Inter, system-ui, sans-serif`;
         ctx.textAlign = "center";
         ctx.fillStyle = node.filled ? NAVY : TEXT;
-        ctx.fillText(node.label, node.x, node.y + node.radius + 18);
+        ctx.fillText(node.label, node.x, node.y + node.radius + labelOffset);
 
         // Sublabel
-        ctx.font = `400 9px 'JetBrains Mono', monospace`;
+        ctx.font = `400 ${sublabelSize}px 'JetBrains Mono', monospace`;
         ctx.fillStyle = TEXT_MUTED;
-        ctx.fillText(node.sublabel, node.x, node.y + node.radius + 30);
+        ctx.fillText(node.sublabel, node.x, node.y + node.radius + sublabelOffset);
       }
 
       animRef.current = requestAnimationFrame(animate);
@@ -297,7 +309,7 @@ export function ArchitectureDiagram() {
 
         <div
           ref={containerRef}
-          className="relative w-full h-[240px] md:h-[300px]"
+          className="relative w-full h-[280px] sm:h-[260px] md:h-[300px]"
         >
           <canvas
             ref={canvasRef}
