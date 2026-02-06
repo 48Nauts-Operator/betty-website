@@ -50,13 +50,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {process.env.NEXT_PUBLIC_ANALYTICS_ID && (
-          <script
-            defer
-            src={process.env.NEXT_PUBLIC_ANALYTICS_URL || "https://wave.21nauts.com/script.js"}
-            data-website-id={process.env.NEXT_PUBLIC_ANALYTICS_ID}
-          />
-        )}
+        <script
+          defer
+          src="https://wave.21nauts.com/script.js"
+          data-website-id="0234101f-f471-4ce7-b749-2a756a3885f7"
+        />
       </head>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}
